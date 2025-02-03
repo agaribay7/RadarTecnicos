@@ -12,7 +12,6 @@ df["Equipo"] = df["Equipo"].astype(str)
 
 # Reemplazar NaN por "Desconocido" en la columna 'Técnico'
 df["Técnico"] = df["Técnico"].fillna("Otros")
-
 df["Técnico"] = df["Técnico"].astype(str)
 
 # Título de la aplicación
@@ -73,6 +72,9 @@ else:
 
         # Transformar datos para gráfico de radar
         radar_melted = radar_data.melt(id_vars="Técnico", var_name="Métrica", value_name="Valor")
+
+        # Quitar la palabra 'Norm' de las métricas
+        radar_melted['Métrica'] = radar_melted['Métrica'].str.replace("Norm", "", regex=False)
 
         # Asignación de colores a técnicos específicos con mayor transparencia
         color_map = {
