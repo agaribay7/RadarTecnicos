@@ -11,7 +11,7 @@ df["Liga"] = df["Liga"].astype(str)
 df["Equipo"] = df["Equipo"].astype(str)
 
 # Reemplazar NaN por "Desconocido" en la columna 'Técnico'
-df["Técnico"] = df["Técnico"].fillna("Desconocido")
+df["Técnico"] = df["Técnico"].fillna("Otros")
 
 df["Técnico"] = df["Técnico"].astype(str)
 
