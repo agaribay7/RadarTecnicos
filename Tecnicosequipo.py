@@ -121,7 +121,27 @@ else:
         st.error("No hay métricas numéricas disponibles.")
     else:
         # Extraer solo el nombre del equipo (sin la temporada) para el gráfico
-        df_filtrado["Equipo"] = df_filtrado["Equipo_Temporada"].str.extract(r"^(.*) \D*\d{2,4}$", expand=False).fillna(df_filtrado["Equipo_Temporada"])
+        df_filtrado["Equipo"] = df_filtrado["Equipo_Temporada"].apply(lambda x: x.rsplit(" ", 1)[0])
+        
+        # Reordenar las métricas según el orden especificado
+        orden_metricas = [
+            "NP xG",
+            "Shots",
+            "Successful Box Cross%",
+            "Directness",
+            "Deep Progressions",
+            "Possession%",
+            "OBV",
+            "Pressures F2%",
+            "Counterpressures F2%",
+            "NP xG Conceded",
+            "Shots Conceded",
+            "Deep Progressions Conceded",
+            "PPDA",
+            "Defensive Distance"
+        ]
+        metricas = [m for m in orden_metricas if m in metricas]
+        
         radar_data = df_filtrado.groupby("Equipo")[metricas].mean().reset_index()
         
         if normalizar_datos:
@@ -132,18 +152,21 @@ else:
             # Aplicar normalización Min-Max
             radar_data[metricas] = (radar_data[metricas] - min_values) / (max_values - min_values)
             radar_data[metricas] = radar_data[metricas].fillna(0)  # Manejo de posibles divisiones por cero
+            
+            # Aplicar clip para asegurar que los valores se mantengan en el rango [0, 1]
+            radar_data[metricas] = radar_data[metricas].clip(0, 1)
         
         # Configurar colores para los equipos (manteniendo la lógica original)
         # Se modifica el orden para que el primer color sea naranja y el segundo azul, luego los demás
         colores_restantes = [
             "rgba(255, 165, 0, 0.5)",  # Naranja
             "rgba(0, 51, 102, 0.5)",   # Azul oscuro (equivalente a #003366)
+            "rgba(164, 91, 2, 0.5)",   # Naranja oscuro
+            "rgba(0, 128, 128, 0.5)",  # Verde azulado
             "rgba(255, 255, 0, 0.5)",  # Amarillo
             "rgba(128, 0, 128, 0.5)",  # Morado
             "rgba(0, 255, 255, 0.5)",  # Cian
-            "rgba(255, 105, 180, 0.5)",  # Rosa
-            "rgba(255, 140, 0, 0.5)",  # Naranja oscuro
-            "rgba(0, 128, 128, 0.5)"   # Verde azulado
+            "rgba(255, 105, 180, 0.5)" # Rosa
         ]
         
         color_map = {equipo: colores_restantes[i % len(colores_restantes)] for i, equipo in enumerate(radar_data["Equipo"])}
@@ -176,15 +199,15 @@ else:
             theta_complete = list(metricas) + [metricas[0]]
             
             fig.add_trace(go.Scatterpolar(
-            r=r_complete,
-            theta=theta_complete,
-            mode="lines",  # O "lines+markers" si deseas ver los puntos
-            fill='toself',
-            name=equipo,
-            fillcolor=fill_color,
-            line=dict(color=line_color, width=2),
-            hoveron="fills+points",  # Esto activa el hover sobre el relleno
-            hoverinfo="all"  # Opcional, para asegurarte de que se muestre toda la información
+                r=r_complete,
+                theta=theta_complete,
+                mode="lines",  # O "lines+markers" si deseas ver los puntos
+                fill='toself',
+                name=equipo,
+                fillcolor=fill_color,
+                line=dict(color=line_color, width=2),
+                hoveron="fills+points",  # Esto activa el hover sobre el relleno
+                hoverinfo="all"  # Opcional, para asegurarte de que se muestre toda la información
             ))
                 
         # Personalizar gráfico
