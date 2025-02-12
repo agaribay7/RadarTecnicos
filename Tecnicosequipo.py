@@ -37,19 +37,35 @@ st.title("Comparación de Equipos por Métricas")
 with st.sidebar:
     st.header("Filtros")
     
-    # Filtro por Temporada
-    st.subheader("Temporada")
-    temporada_options = sorted(df["Temporada"].unique())
-    seleccion_todas_temporadas = st.checkbox("Seleccionar Todas (Temporada)", value=True)
-    temporadas_seleccionadas = [t for t in temporada_options if seleccion_todas_temporadas or st.checkbox(t, key=f"temp_{t}")]
+    # Filtro por Temporada dentro de su propio expander
+    with st.expander("Temporada", expanded=True):
+        temporada_options = sorted(df["Temporada"].unique())
+        # Lista de temporadas que se desean DESDELECCIONAR por defecto
+        temporadas_deseleccionadas = [
+            "2019/2020HC",
+            "2020/2021HC",
+            "2021/2022AK",
+            "2021HC",
+            "2022/2023AK",
+            "2022/2023JL",
+            "2024/2025JL"
+        ]
+        seleccion_todas_temporadas = st.checkbox("Seleccionar Todas (Temporada)", value=False)
+        temporadas_seleccionadas = [
+            t for t in temporada_options
+            if seleccion_todas_temporadas or st.checkbox(t, key=f"temp_{t}", value=(t not in temporadas_deseleccionadas))
+        ]
     
-    # Filtro por Liga
-    st.subheader("Liga")
-    liga_options = sorted(df["Liga"].unique())
-    seleccion_todas_ligas = st.checkbox("Seleccionar Todas (Liga)", value=True)
-    ligas_seleccionadas = [l for l in liga_options if seleccion_todas_ligas or st.checkbox(l, key=f"liga_{l}")]
+    # Filtro por Liga dentro de su propio expander
+    with st.expander("Liga", expanded=True):
+        liga_options = sorted(df["Liga"].unique())
+        seleccion_todas_ligas = st.checkbox("Seleccionar Todas (Liga)", value=True)
+        ligas_seleccionadas = [
+            l for l in liga_options
+            if seleccion_todas_ligas or st.checkbox(l, key=f"liga_{l}")
+        ]
     
-    # Sección de equipos
+    # Sección de equipos (sin cambios)
     st.subheader("Equipo (Máximo 5 seleccionados)")
     equipos_disponibles = sorted(df["Equipo_Temporada"].unique())
     
@@ -98,7 +114,7 @@ with st.sidebar:
                 equipos_seleccionados.append(equipo_temp)
                 unique_selecciones.add(team)
     
-    # Opción para activar/desactivar normalización
+    # Opción para activar/desactivar normalización (sin cambios)
     normalizar_datos = st.checkbox("Normalizar métricas", value=True)
 
 # Filtrar datos para la normalización (basado en liga y temporada, no en equipo)
