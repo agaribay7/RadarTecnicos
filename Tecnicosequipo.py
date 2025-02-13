@@ -37,8 +37,8 @@ st.title("Comparación de Equipos por Métricas")
 with st.sidebar:
     st.header("Filtros")
     
-    # Filtro por Temporada dentro de su propio expander
-    with st.expander("Temporada", expanded=True):
+    # Filtro por Temporada dentro de su propio expander (minimizado por defecto)
+    with st.expander("Temporada", expanded=False):
         temporada_options = sorted(df["Temporada"].unique())
         # Lista de temporadas que se desean DESDELECCIONAR por defecto
         temporadas_deseleccionadas = [
@@ -56,8 +56,8 @@ with st.sidebar:
             if seleccion_todas_temporadas or st.checkbox(t, key=f"temp_{t}", value=(t not in temporadas_deseleccionadas))
         ]
     
-    # Filtro por Liga dentro de su propio expander
-    with st.expander("Liga", expanded=True):
+    # Filtro por Liga dentro de su propio expander (minimizado por defecto)
+    with st.expander("Liga", expanded=False):
         liga_options = sorted(df["Liga"].unique())
         seleccion_todas_ligas = st.checkbox("Seleccionar Todas (Liga)", value=True)
         ligas_seleccionadas = [
